@@ -1,0 +1,13 @@
+[build]
+  publish = "site"
+  command = "echo 'No build needed'"
+
+[functions]
+  directory = "functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
