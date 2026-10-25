@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tutlix Members</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2A2A2E;--paper:#FFF8EE;--card:#FFFDF8;--yel:#FBDF4A;--green:#22D3A5;--red:#E0476F;--blue:#3D55F5;--muted:#6B6670}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 60px}
+h1{font:800 32px 'Bricolage Grotesque',sans-serif;margin:0 0 4px}
+h2{font:800 20px 'Bricolage Grotesque',sans-serif;margin:0 0 12px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:18px;padding:18px;margin:0 0 18px;box-shadow:4px 4px 0 var(--ink)}
+label{display:grid;gap:4px;font:700 12px 'Space Mono',monospace}
+input,select{font:16px system-ui,sans-serif;padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:#fff;width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.btn{font:700 15px system-ui,sans-serif;background:var(--yel);color:var(--ink);border:2.5px solid var(--ink);border-radius:999px;padding:10px 18px;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:none}
+.btn.alt{background:#fff}.btn.small{padding:5px 11px;font-size:13px}.btn.red{background:#FFD6DE}
+.code{font:700 26px 'Space Mono',monospace;letter-spacing:2px;background:#fff;border:2px dashed var(--ink);border-radius:12px;padding:10px 14px;display:inline-block}
+.msgbox{white-space:pre-wrap;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1.5px solid #e6dccd;vertical-align:top}
+th{font:700 11px 'Space Mono',monospace;text-transform:uppercase}
+td.c{font:700 13px 'Space Mono',monospace;white-space:nowrap}
+.pill{display:inline-block;font:700 11px 'Space Mono',monospace;padding:2px 8px;border-radius:999px;border:1.5px solid var(--ink)}
+.ok{background:#C9F3E6}.exp{background:#FDF1B0}.rev{background:#FFD6DE}
+.acts{display:flex;gap:4px;flex-wrap:wrap}
+#err{color:var(--red);font-weight:700;min-height:1.5em;margin:6px 0 0}
+.tablewrap{overflow-x:auto}
+@media (max-width:640px){th.hide,td.hide{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tutlix Members</h1>
+  <p class="sub">Create a personal access code for each paying student, and manage who has access.</p>
+
+  <section class="card" id="login">
+    <h2>🔐 Admin login</h2>
+    <div class="grid" style="align-items:end">
+      <label>Admin password<input id="pw" type="password" autocomplete="current-password"></label>
+      <div><button class="btn" id="loginBtn" type="button">Log in</button></div>
+    </div>
+    <p id="err" role="alert"></p>
+  </section>
+
+  <div id="app" hidden>
+    <section class="card">
+      <h2>➕ New member</h2>
+      <div class="grid">
+        <label>Student name<input id="name" placeholder="e.g. Aisha Khan"></label>
+        <label>Email<input id="email" type="email" placeholder="student@email.com"></label>
+        <label>Access length<select id="months"><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12">12 months</option><option value="0">No expiry</option></select></label>
+        <label>Devices allowed<select id="max"><option value="1">1 device</option><option value="2" selected>2 devices</option><option value="3">3 devices</option></select></label>
+      </div>
+      <label style="margin-top:12px">Private note (optional, only you see this)<input id="note" placeholder="e.g. paid $20 via Payoneer 25 Oct"></label>
+      <p style="margin:14px 0 0"><button class="btn" id="createBtn" type="button">Create access code</button></p>
+      <div id="result" hidden style="margin-top:16px">
+        <p style="margin:0 0 6px;font-weight:700">New code:</p>
+        <p style="margin:0 0 10px"><span class="code" id="newCode"></span> <button class="btn small alt" type="button" data-copy="newCode">Copy code</button></p>
+        <p style="margin:0 0 6px;font-weight:700">Message to send the student:</p>
+        <div class="msgbox" id="newMsg"></div>
+        <p style="margin:8px 0 0"><button class="btn small alt" type="button" data-copy="newMsg">Copy message</button></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px">
+        <h2 style="margin:0">👥 Members <span id="count"></span></h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" placeholder="Search name, email or code" style="width:220px"><button class="btn small alt" id="refresh" type="button">↻ Refresh</button></div>
+      </div>
+      <div class="tablewrap"><table><thead><tr><th>Code</th><th>Student</th><th>Status</th><th class="hide">Devices</th><th class="hide">Last used</th><th>Actions</th></tr></thead><tbody id="rows"><tr><td colspan="6">Loading…</td></tr></tbody></table></div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);let PW='';let ALL=[];
+try{PW=sessionStorage.getItem('tx_admin')||'';}catch(e){}
+async function api(action,extra){const r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({password:PW,action},extra||{}))});const j=await r.json().catch(()=>({error:'Server error ('+r.status+')'}));if(!r.ok)throw new Error(j.error||('Error '+r.status));return j;}
+const fmt=t=>t?new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function login(){$('err').textContent='';PW=$('pw').value||PW;try{await api('login');try{sessionStorage.setItem('tx_admin',PW);}catch(e){}$('login').hidden=true;$('app').hidden=false;load();}catch(e){$('err').textContent=e.message;try{sessionStorage.removeItem('tx_admin');}catch(_){}}}
+$('loginBtn').addEventListener('click',login);$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+async function load(){try{const j=await api('list');ALL=j.members;render();}catch(e){$('rows').innerHTML='<tr><td colspan="6">'+esc(e.message)+'</td></tr>';}}
+function status(m){if(m.revoked)return '<span class="pill rev">revoked</span>';if(m.expires&&Date.now()>m.expires)return '<span class="pill exp">expired</span>';return '<span class="pill ok">active</span>'+(m.expires?'<br><small>until '+fmt(m.expires)+'</small>':'<br><small>no expiry</small>');}
+function render(){const q=$('q').value.trim().toLowerCase();const list=ALL.filter(m=>!q||[m.code,m.name,m.email,m.note].join(' ').toLowerCase().includes(q));$('count').textContent='('+ALL.length+')';
+ $('rows').innerHTML=list.length?list.map(m=>`<tr><td class="c">${esc(m.code)}</td><td><b>${esc(m.name)||'—'}</b><br><small>${esc(m.email)}</small>${m.note?'<br><small style="color:#6B6670">'+esc(m.note)+'</small>':''}</td><td>${status(m)}</td><td class="hide">${m.devices} / ${m.max}</td><td class="hide">${fmt(m.lastUsed)}</td>
+ <td><div class="acts"><button class="btn small alt" data-a="extend" data-c="${esc(m.code)}">+1 month</button><button class="btn small alt" data-a="reset" data-c="${esc(m.code)}">Reset devices</button>${m.revoked?`<button class="btn small alt" data-a="restore" data-c="${esc(m.code)}">Restore</button>`:`<button class="btn small red" data-a="revoke" data-c="${esc(m.code)}">Revoke</button>`}<button class="btn small red" data-a="delete" data-c="${esc(m.code)}">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="6">No members yet. Create the first one above!</td></tr>';}
+$('rows').addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,c=b.dataset.c;
+ if(a==='delete'&&!confirmDel(c))return;b.disabled=true;try{await api(a,{code:c,months:1});await load();}catch(err){alert(err.message);}finally{b.disabled=false;}});
+function confirmDel(c){return window.confirm('Delete '+c+' permanently? The student will lose access.');}
+$('q').addEventListener('input',render);$('refresh').addEventListener('click',load);
+$('createBtn').addEventListener('click',async()=>{const b=$('createBtn');b.disabled=true;b.textContent='Creating…';
+ try{const m=await api('create',{name:$('name').value,email:$('email').value,months:$('months').value,max:$('max').value,note:$('note').value});
+  $('newCode').textContent=m.code;const first=(m.name||'').split(' ')[0];
+  $('newMsg').textContent=`Hi${first?' '+first:''}! 🎉\n\nWelcome to Tutlix. Here is your personal access code:\n\n${m.code}\n\nOpen any Biology notes page on tutlix.com, scroll to the 🔒 members section, enter your code and press Unlock. It stays unlocked on that device.\n\nYour code works on up to ${m.max} device${m.max>1?'s':''}${m.expires?' and is valid until '+fmt(m.expires):''}. Please keep it private: it is linked to your account.\n\nHappy studying!\nTutlix`;
+  $('result').hidden=false;['name','email','note'].forEach(id=>$(id).value='');load();}
+ catch(e){alert(e.message);}finally{b.disabled=false;b.textContent='Create access code';}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b)return;const t=$(b.dataset.copy).textContent;navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='✓ Copied';setTimeout(()=>b.textContent=o,1500);});});
+if(PW)login();
+})();
+</script>
+</body>
+</html>
