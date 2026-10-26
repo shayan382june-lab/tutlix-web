@@ -92,7 +92,7 @@ footer{text-align:center;font-family:var(--mono);font-size:13px;color:var(--mute
 .faq details{border:2px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);margin-bottom:10px}.faq summary{font-weight:700;cursor:pointer}.faq p{margin:8px 0 0;color:var(--muted)}
 .secure{font:13px var(--mono);color:var(--muted);margin:0}
 .soon{font:700 11px var(--mono);vertical-align:middle;background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:2px 10px;margin-left:8px;letter-spacing:0}
-.memb{background:var(--math)}
+.memb{background:linear-gradient(120deg,#7B5CFF 0%,#A86BFF 100%);color:#fff}.memb .label{color:#EDE6FF}.memb h2,.memb p{color:#fff}
 /* top navigation bar */
 .topbar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 4px 0 rgba(42,42,46,.12)}
 .topbar .in{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px max(16px,env(safe-area-inset-left,0px))}
@@ -197,6 +197,7 @@ body.wide .wrap{max-width:1160px}
    Prices, and links to notes/questions.
    To publish a file, put its link in NOTES or QUESTIONS using the topic code, e.g.
    NOTES = { 'A1.1': 'https://drive.google.com/...' }                              */
+const FULLY_FREE = ['A1.1','A1.2','A2.1'];
 const PRICE = 20, TRIAL = 5;
 /* Membership prices (USD). Change here any time. */
 const MEMBERSHIP = { monthly: 9.99, yearly: 69 };
@@ -477,7 +478,7 @@ function library(k,kind){
     const html=s.themes.map(([code,name,items])=>{
       const rows=items.filter(([c,n,h])=>(lv==='all'||(lv==='hl'?h:!h))&&(!f||(c+' '+n).toLowerCase().includes(f)));
       if(!rows.length) return '';
-      return `<section class="card theme"><h3>${esc(code.length===1?'Theme '+code:code)}<small>${esc(name)}</small></h3><ul class="list">${rows.map(([c,n,h])=>`<li class="item"><span class="code">${c}</span><span class="name">${esc(n)}${h?'<span class="hl">HL</span>':''}</span><span class="end">${map[c]?`<a class="open" href="${esc(map[c])}"${/^https?:/.test(map[c])?' target="_blank" rel="noopener"':''}>${action} →</a>`:'<span class="status">Coming soon</span>'}</span></li>`).join('')}</ul></section>`;
+      return `<section class="card theme"><h3>${esc(code.length===1?'Theme '+code:code)}<small>${esc(name)}</small></h3><ul class="list">${rows.map(([c,n,h])=>`<li class="item"><span class="code">${c}</span><span class="name">${esc(n)}${h?'<span class="hl">HL</span>':''}${k==='biology'&&FULLY_FREE.includes(c)?'<span class="hl" style="background:var(--math)">100% FREE</span>':''}</span><span class="end">${map[c]?`<a class="open" href="${esc(map[c])}"${/^https?:/.test(map[c])?' target="_blank" rel="noopener"':''}>${action} →</a>`:'<span class="status">Coming soon</span>'}</span></li>`).join('')}</ul></section>`;
     }).join('');
     document.getElementById('themes').innerHTML=html||'<p class="card empty">No topics match. Try a different word.</p>';
   };
