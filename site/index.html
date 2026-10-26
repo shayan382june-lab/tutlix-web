@@ -10,7 +10,7 @@
 <style>
 /* Layout: one narrow column of chunky "index cards" on graph paper, like a revision binder. Single light look by choice. */
 :root{
-  --paper:#F3E6D6; --grid:rgba(42,42,46,.07); --ink:#2A2A2E; --card:#FFFDF8; --muted:#57525C;
+  --paper:#F5F2EC; --grid:rgba(42,42,46,.07); --ink:#2A2A2E; --card:#FFFDF8; --muted:#57525C;
   --bio:#FBDF4A; --chem:#3D55F5; --phys:#F25C84; --math:#22D3A5;
   --display:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,'Courier New',monospace;
@@ -18,8 +18,7 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+body{margin:0;background:#FFFFFF;color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5}
 .wrap{max-width:680px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:22px 24px}
 a{color:inherit}
@@ -96,7 +95,7 @@ footer{text-align:center;font-family:var(--mono);font-size:13px;color:var(--mute
 .memb{background:var(--math)}
 /* top navigation bar */
 .topbar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 4px 0 rgba(42,42,46,.12)}
-.topbar .in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px max(16px,env(safe-area-inset-left,0px))}
+.topbar .in{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px max(16px,env(safe-area-inset-left,0px))}
 .tb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 24px var(--display);letter-spacing:.5px}
 .tb-brand svg{width:40px;height:40px}
 .tb-nav{display:flex;align-items:center;gap:4px;margin-left:auto}
@@ -119,10 +118,51 @@ footer{text-align:center;font-family:var(--mono);font-size:13px;color:var(--mute
  .ddmenu{position:static;box-shadow:none;border-width:2px;margin:4px 0 0}
 }
 /* landing page */
+.landing{background:linear-gradient(135deg,#FFF6CC 0%,#FFE9F0 55%,#E4F0FF 100%)!important}
+.landing .stats .stat:nth-child(1){background:#FFF3B0}.landing .stats .stat:nth-child(2){background:#DCE3FF}
+.landing .stats .stat:nth-child(3){background:#FFD9E4}.landing .stats .stat:nth-child(4){background:#C9F3E6}
+.stats4{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+@media (min-width:760px){.stats4{grid-template-columns:repeat(4,1fr)}}
+.stats4 .stat{padding:16px 18px;box-shadow:4px 4px 0 var(--ink)}
+.stats4 .stat b{font-size:30px}
+.stats4 .stat:nth-child(1){background:#FFF3B0}.stats4 .stat:nth-child(2){background:#DCE3FF}.stats4 .stat:nth-child(3){background:#FFD9E4}.stats4 .stat:nth-child(4){background:#C9F3E6}
+.feats .feat:nth-child(1){background:#FFF8D6}.feats .feat:nth-child(2){background:#FFE6EE}.feats .feat:nth-child(3){background:#DDF7EE}
+.feat p{color:#3F3B45!important}
+#about{background:#EAF0FF}
+.landing .blob,.landing .blob2{display:none}
+/* hero animation: spinning DNA + floating science icons */
+.heroart{position:relative;height:340px;display:grid;place-items:center}
+.helix{position:relative;width:170px;height:300px;perspective:600px}
+.rung{position:absolute;left:0;right:0;height:4px;top:calc(var(--i) * 20px + 6px);transform-style:preserve-3d;animation:spin 4.5s linear infinite;animation-delay:calc(var(--i) * -0.3s)}
+.rung::before,.rung::after{content:"";position:absolute;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;border:3px solid var(--ink)}
+.rung::before{left:0;background:var(--bio)}.rung::after{right:0;background:var(--chem)}
+.rung:nth-child(3n)::before{background:var(--phys)}.rung:nth-child(3n+1)::after{background:var(--math)}
+.rung i{position:absolute;left:22px;right:22px;top:0;height:4px;background:var(--ink);border-radius:2px;opacity:.75}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.floaty{position:absolute;width:62px;height:62px;border:3px solid var(--ink);border-radius:16px;display:grid;place-items:center;font-size:30px;box-shadow:4px 4px 0 var(--ink);animation:bob 3.6s ease-in-out infinite}
+.floaty.f1{left:4%;top:8%;background:#FFF3B0}.floaty.f2{right:4%;top:18%;background:#DCE3FF;animation-delay:-1.2s}
+.floaty.f3{left:10%;bottom:8%;background:#FFD9E4;animation-delay:-2.1s}.floaty.f4{right:10%;bottom:4%;background:#C9F3E6;animation-delay:-.6s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+@media (max-width:899px){.heroart{height:250px}.helix{transform:scale(.78)}.floaty{width:50px;height:50px;font-size:24px}.floaty.f1{left:0;top:4%}.floaty.f2{right:0;top:10%}.floaty.f3{left:2%;bottom:2%}.floaty.f4{right:2%;bottom:0}}
+/* scroll reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rung,.floaty{animation:none}.rv{opacity:1;transform:none;transition:none}}
+body.wide .wrap{max-width:1160px}
+.hero-grid{display:grid;gap:22px;align-items:center}
+@media (min-width:900px){.hero-grid{grid-template-columns:1.35fr 1fr;gap:36px}.landing{padding:44px 40px}}
+.landing .stats{grid-template-columns:1fr 1fr}
+.subjects{display:grid;gap:18px}
+@media (min-width:760px){.subjects{grid-template-columns:1fr 1fr}}
+.subjects .tap{min-height:120px}
+.memb .mrow{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between}
+.memb .mrow p{max-width:640px}
+.feats{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important}
+.about-grid{display:grid;gap:10px 36px}
+@media (min-width:900px){.about-grid{grid-template-columns:1.4fr 1fr}}
 .landing{padding:28px 24px 26px;background:var(--card);position:relative;overflow:hidden}
-.landing h1{max-width:560px;font-size:clamp(38px,9vw,58px);font-weight:800;line-height:1.02;margin:8px 0 12px;letter-spacing:.3px}
-.landing h1 mark{background:var(--bio);padding:0 6px;border:3px solid var(--ink);border-radius:10px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.landing p.lead{font-family:var(--mono);font-size:15px;margin:0 0 18px;max-width:520px}
+.landing h1{max-width:640px;font-size:clamp(31px,8.2vw,62px);font-weight:800;line-height:1.22;margin:10px 0 18px;letter-spacing:.3px}
+.landing h1 mark{background:var(--bio);padding:0 10px;display:inline-block;margin-top:6px;border:3px solid var(--ink);border-radius:10px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.landing p.lead{font-size:18px;line-height:1.55;color:var(--muted);margin:0 0 22px;max-width:560px}
 .landing .ctas{display:flex;flex-wrap:wrap;gap:12px}
 .btn.alt{background:var(--card)}
 .landing .blob{position:absolute;right:-56px;top:-56px;width:140px;height:140px;border-radius:50%;background:var(--math);border:3px solid var(--ink);z-index:0}
@@ -287,34 +327,46 @@ const footer=()=>`<footer><nav class="fnav" aria-label="Footer"><a href="#biolog
 const count=(map,s)=>s.themes.reduce((n,t)=>n+t[2].filter(x=>map[x[0]]).length,0);
 const total=s=>s.themes.reduce((n,t)=>n+t[2].length,0);
 
+function reveal(){
+  const els=[...document.querySelectorAll('.rv')];
+  const countUp=el=>el.querySelectorAll('.stat b').forEach(b=>{const m=b.textContent.match(/^(\$?)(\d+)(.*)$/);if(!m||b.dataset.done)return;b.dataset.done=1;const end=+m[2],t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/1100),v=Math.round(end*(1-Math.pow(1-k,3)));b.textContent=m[1]+v+m[3];if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);});
+  if(!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(e=>e.classList.add('in'));return;}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');countUp(e.target);io.unobserve(e.target);}}),{threshold:.12});
+  els.forEach(e=>io.observe(e));
+}
 function home(){
   const bioN=count(NOTES,SUBJECTS.biology);
   const feat=(href,bg,ico,t,d)=>`<a class="card feat" href="${href}"><span class="ico" style="background:${bg}">${ico}</span><h3>${t}</h3><p>${d}</p></a>`;
   app.innerHTML=
   `<section class="card landing"><span class="blob" aria-hidden="true"></span><span class="blob2" aria-hidden="true"></span>
+   <div class="hero-grid"><div>
     <span class="label">IB Diploma · SL &amp; HL</span>
-    <h1>IB science, <mark>made interactive.</mark></h1>
+    <h1>IB science,<br><mark>made interactive.</mark></h1>
     <p class="lead">Free notes with 3D models, simulations and games, exam-style question banks, and live 1-to-1 tutoring for Biology, Chemistry, Physics and Maths.</p>
-    <div class="ctas"><a class="btn" href="#biology-notes">Explore free notes ${arrow}</a><a class="btn alt" href="biology-qbank.html">Try the Qbank</a><a class="btn alt" href="#pricing">See membership</a></div>
-  </section>
-  <div class="stats">
+    <div class="ctas"><a class="btn" href="#biology-notes">Explore free notes ${arrow}</a><a class="btn alt" href="biology-qbank.html">Try the Qbank</a></div>
+   </div>
+  <div class="heroart" aria-hidden="true"><div class="helix">${Array.from({length:15},(_,i)=>`<div class="rung" style="--i:${i}"><i></i></div>`).join('')}</div>
+    <span class="floaty f1">🧬</span><span class="floaty f2">⚗️</span><span class="floaty f3">⚛️</span><span class="floaty f4">📐</span></div>
+  </div></section>
+  <div class="stats4 rv">
     <div class="stat"><b>${bioN}</b><span>interactive Biology topics</span></div>
     <div class="stat"><b>3D</b><span>models, sims &amp; games</span></div>
     <div class="stat"><b>440+</b><span>exam-style Biology questions</span></div>
     <div class="stat"><b>$${PRICE}/hr</b><span>live 1-to-1 lessons</span></div>
   </div>
-  <h2 class="sechead">Choose your subject</h2>`+
-  Object.entries(SUBJECTS).map(([k,s])=>`<a class="card tap ${s.cls}" href="#${k}"><div><h2>${s.name.toUpperCase()}${count(NOTES,s)?'':' <span class="soon">Coming soon</span>'}</h2><p>${count(NOTES,s)?`SL &amp; HL · ${count(NOTES,s)} interactive topics · Qbank · tutoring`:'Notes and questions in progress · tutoring available'}</p></div><span class="go">${arrow}</span></a>`).join('')+
-  `<section class="card section memb"><span class="label">Tutlix membership</span><h2 style="margin:6px 0 4px">Unlock everything from $${MEMBERSHIP.monthly}/month</h2><p style="margin:0 0 14px;font-family:var(--mono);font-size:14px">Full access to every interactive note and the complete Qbank. Cancel any time · 14-day money-back guarantee.</p><a class="btn" href="#pricing">See plans ${arrow}</a></section>
-  <h2 class="sechead">Why students use Tutlix</h2>
-  <div class="feats">
+  <h2 class="sechead rv">Choose your subject</h2><div class="subjects rv">`+
+  Object.entries(SUBJECTS).map(([k,s])=>`<a class="card tap ${s.cls}" href="#${k}"><div><h2>${s.name.toUpperCase()}${count(NOTES,s)?'':' <span class="soon">Coming soon</span>'}</h2><p>${count(NOTES,s)?`SL &amp; HL · ${count(NOTES,s)} interactive topics · Qbank · tutoring`:'Notes and questions in progress · tutoring available'}</p></div><span class="go">${arrow}</span></a>`).join('')+`</div>`+
+  `<section class="card section memb rv"><div class="mrow"><div><span class="label">Tutlix membership</span><h2 style="margin:6px 0 4px">Unlock everything from $${MEMBERSHIP.monthly}/month</h2><p style="margin:0;font-size:16px">Full access to every interactive note and the complete Qbank. Cancel any time · 14-day money-back guarantee.</p></div><a class="btn" href="#pricing">See plans ${arrow}</a></div></section>
+  <h2 class="sechead rv">Why students use Tutlix</h2>
+  <div class="feats rv">
     ${feat('#biology-notes','var(--bio)',ICONS.notes,'Notes you can play with','Rotate 3D molecules, run virtual labs and play games that make each topic stick.')}
     ${feat('biology-qbank.html','var(--phys)',ICONS.questions,'Exam-style Qbank','Paper 1 and Paper 2 style questions with instant feedback and full markschemes.')}
     ${feat('#biology-tutoring','var(--math)',ICONS.tutoring,'Live tutoring','1-to-1 online lessons with experienced IB tutors. Start with a $'+TRIAL+' trial.')}
   </div>
-  <section class="card section" id="about"><h2>About Tutlix</h2><p style="margin:0 0 10px">Tutlix is an independent online learning platform for IB Diploma students, built by experienced IB science tutors. Our interactive notes and question banks follow the current IB syllabus topic by topic, and our tutors offer live 1-to-1 lessons for students who want extra help.</p>
-  <p style="margin:0"><b>Contact:</b> <a href="mailto:${CONTACT}">${CONTACT}</a> · we reply within 24 hours.</p></section>`+
+  <section class="card section rv" id="about"><div class="about-grid"><div><h2 style="margin-bottom:10px">About Tutlix</h2><p style="margin:0">Tutlix is an independent online learning platform for IB Diploma students, built by experienced IB science tutors. Our interactive notes and question banks follow the current IB syllabus topic by topic, and our tutors offer live 1-to-1 lessons for students who want extra help.</p>
+  </div><div style="align-self:end"><p style="margin:0"><b>Contact</b><br><a href="mailto:${CONTACT}">${CONTACT}</a><br>We reply within 24 hours.</p></div></div></section>`+
   footer();
+  reveal();
 }
 
 function pricing(){
@@ -359,6 +411,8 @@ function loadPaddle(){
 }
 function openCheckout(plan){
   const msg=document.getElementById('payMsg');
+  let tester=false;try{if(/[?&]paddletest=1/.test(location.search))localStorage.setItem('tutlix_tester','1');tester=localStorage.getItem('tutlix_tester')==='1';}catch(e){}
+  if(PADDLE.env==='sandbox'&&!tester){if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}return;}
   if(!PADDLE.token||!PADDLE[plan]){if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}return;}
   loadPaddle().then(()=>Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}],settings:{displayMode:'overlay',theme:'light',showAddDiscounts:false}}))
    .catch(()=>{if(msg){msg.hidden=false;msg.textContent='The checkout could not load. Please check your connection and try again, or email '+CONTACT+'.';}});
@@ -465,7 +519,7 @@ function navState(h){const tb=document.getElementById('topbar');if(!tb)return;tb
   document.addEventListener('click',e=>{if(!dd.contains(e.target))dd.classList.remove('ddopen');});
   tb.querySelectorAll('.tb-nav a').forEach(a=>a.addEventListener('click',()=>{tb.classList.remove('mopen');dd.classList.remove('ddopen');}));})();
 function route(){
-  const h=(location.hash||'#home').slice(1);navState(h);
+  const h=(location.hash||'#home').slice(1);navState(h);document.body.classList.toggle('wide',h==='home'||h==='pricing'||!h.includes('-')&&!SUBJECTS[h.split('-')[0]]);
   if(h==='pricing'){pricing();window.scrollTo(0,0);return;}
   const [k,sub]=h.split('-');
   if(SUBJECTS[k]){ if(sub==='notes'||sub==='questions') library(k,sub); else if(sub==='tutoring') tutoring(k); else hub(k); }
