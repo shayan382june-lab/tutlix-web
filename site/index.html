@@ -162,7 +162,7 @@ const PRICE = 20, TRIAL = 5;
 const MEMBERSHIP = { monthly: 9.99, yearly: 69 };
 const CONTACT = 'tutlix.ceo@gmail.com';
 /* Paddle checkout: fill these in once Paddle is approved (client-side token + price IDs). */
-const PADDLE = { token: '', monthly: '', yearly: '' };
+const PADDLE = { env: 'sandbox', token: 'test_da2dcc86169e11bf28f88a96b79', monthly: 'pri_01m5vgz0w4zp2qmxds3p03n86c', yearly: 'pri_01m5vh051jc55vfqtt4rwcaxz3' };
 const NOTES = {
   'A1.1': 'biology-a1-1-water.html',
   'A1.2': 'biology-a1-2-nucleic-acids.html',
@@ -346,10 +346,47 @@ function pricing(){
   </section>`+footer();
   document.querySelectorAll('[data-plan]').forEach(b=>b.addEventListener('click',()=>openCheckout(b.dataset.plan)));
 }
+let paddleReady=null;
+function loadPaddle(){
+  if(paddleReady) return paddleReady;
+  paddleReady=new Promise((res,rej)=>{
+    if(!PADDLE.token) return rej(new Error('no token'));
+    const sc=document.createElement('script');sc.src='https://cdn.paddle.com/paddle/v2/paddle.js';
+    sc.onload=()=>{try{if(PADDLE.env==='sandbox')Paddle.Environment.set('sandbox');
+      Paddle.Initialize({token:PADDLE.token,eventCallback:e=>{if(e&&e.name==='checkout.completed'&&e.data)claimCode(e.data.transaction_id);}});res();}catch(err){rej(err);}};
+    sc.onerror=()=>rej(new Error('load failed'));document.head.appendChild(sc);});
+  return paddleReady;
+}
 function openCheckout(plan){
   const msg=document.getElementById('payMsg');
-  if(window.Paddle&&PADDLE.token&&PADDLE[plan]){Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}]});return;}
-  if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}
+  if(!PADDLE.token||!PADDLE[plan]){if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}return;}
+  loadPaddle().then(()=>Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}],settings:{displayMode:'overlay',theme:'light',showAddDiscounts:false}}))
+   .catch(()=>{if(msg){msg.hidden=false;msg.textContent='The checkout could not load. Please check your connection and try again, or email '+CONTACT+'.';}});
+}
+async function claimCode(txn){
+  if(!txn)return;
+  showWelcome(null);
+  for(let i=0;i<8;i++){
+    try{const r=await fetch('/api/claim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({txn})});const j=await r.json().catch(()=>({}));
+      if(r.ok&&j.code){try{localStorage.setItem('tutlix_member',j.code);localStorage.setItem('tutlix_last_txn',txn);}catch(e){}try{Paddle.Checkout.close();}catch(e){}showWelcome(j.code,j.name);return;}
+      if(j.error&&j.error!=='not_paid'&&j.error!=='lookup_failed')break;}catch(e){}
+    await new Promise(r=>setTimeout(r,2500));}
+  showWelcome('',null,txn);
+}
+function showWelcome(code,name,txn){
+  let m=document.getElementById('welcome');
+  if(!m){m=document.createElement('div');m.id='welcome';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');
+    m.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(42,42,46,.55);display:grid;place-items:center;padding:16px';document.body.appendChild(m);}
+  const card=c=>`<section class="card" style="max-width:460px;width:100%;display:grid;gap:12px;text-align:center">${c}</section>`;
+  if(code===null){m.innerHTML=card('<span style="font-size:40px">⏳</span><h2 style="font-size:24px">Payment received!</h2><p style="margin:0;font-family:var(--mono);font-size:14px">Creating your personal access code…</p>');return;}
+  if(!code){m.innerHTML=card(`<span style="font-size:40px">📧</span><h2 style="font-size:22px">Almost there</h2><p style="margin:0">Your payment went through, but we couldn't create your code automatically. Please email <a href="mailto:${CONTACT}">${CONTACT}</a> with this reference and we'll send your code right away:</p><p style="font:700 14px var(--mono);word-break:break-all;margin:0">${txn||''}</p><button class="btn" type="button" id="wClose">Close</button>`);document.getElementById('wClose').onclick=()=>m.remove();return;}
+  m.innerHTML=card(`<span style="font-size:44px">🎉</span><h2 style="font-size:26px">Welcome to Tutlix${name?', '+name.split(' ')[0]:''}!</h2>
+   <p style="margin:0">Here is your personal access code:</p>
+   <p style="font:700 26px var(--mono);letter-spacing:2px;border:2px dashed var(--ink);border-radius:12px;padding:10px;margin:0;background:#fff">${code}</p>
+   <p style="margin:0;font-size:15px;color:var(--muted)">It's already saved on this device, so the notes and Qbank will unlock automatically. <b>Write it down</b> to use it on a second device (2 devices allowed).</p>
+   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn alt" type="button" id="wCopy">Copy code</button><a class="btn" href="#biology-notes" id="wGo">Start learning ${arrow}</a></div>`);
+  document.getElementById('wCopy').onclick=e=>{navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>e.target.textContent='✓ Copied');};
+  document.getElementById('wGo').onclick=()=>m.remove();
 }
 
 function crumbs(k,last){
