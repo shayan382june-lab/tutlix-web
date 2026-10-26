@@ -200,7 +200,7 @@ body.wide .wrap{max-width:1160px}
    Prices, and links to notes/questions.
    To publish a file, put its link in NOTES or QUESTIONS using the topic code, e.g.
    NOTES = { 'A1.1': 'https://drive.google.com/...' }                              */
-const FULLY_FREE = ['A1.1','A1.2','A2.1'];
+const FULLY_FREE = ['A1.1','A2.1'];
 const PRICE = 20, TRIAL = 5;
 /* Membership prices (USD). Change here any time. */
 const MEMBERSHIP = { monthly: 9.99, yearly: 69 };
@@ -377,7 +377,7 @@ function pricing(){
   const m=MEMBERSHIP, save=Math.round((1-m.yearly/(m.monthly*12))*100);
   const inc=['All interactive notes for every topic (SL &amp; HL)','3D models, simulations, virtual labs and games','The full exam-style Qbank with markschemes','Custom timed tests and progress tracking','New topics and subjects as they are added'];
   app.innerHTML=`<nav class="crumbs" aria-label="Breadcrumb"><a href="#home">Home</a><span aria-hidden="true">›</span><span>Pricing</span></nav>
-  <section class="card hero bio"><span class="label">Tutlix membership</span><h1>PRICING</h1><p>Try 3 topics free. Upgrade for full access to every interactive note and the complete question bank.</p></section>
+  <section class="card hero bio"><span class="label">Tutlix membership</span><h1>PRICING</h1><p>Try 2 topics free. Upgrade for full access to every interactive note and the complete question bank.</p></section>
   <div class="plans">
     <section class="card plan"><span class="label">Monthly</span><div class="amt">$${m.monthly}<small> /month</small></div><p class="secure">Billed monthly. Cancel any time.</p>
       <ul>${inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn" type="button" data-plan="monthly">Get monthly</button></section>
