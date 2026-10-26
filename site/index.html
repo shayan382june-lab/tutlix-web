@@ -10,7 +10,7 @@
 <style>
 /* Layout: one narrow column of chunky "index cards" on graph paper, like a revision binder. Single light look by choice. */
 :root{
-  --paper:#F5F2EC; --grid:rgba(42,42,46,.07); --ink:#2A2A2E; --card:#FFFDF8; --muted:#57525C;
+  --paper:#F3E6D6; --grid:rgba(42,42,46,.07); --ink:#2A2A2E; --card:#FFFDF8; --muted:#57525C;
   --bio:#FBDF4A; --chem:#3D55F5; --phys:#F25C84; --math:#22D3A5;
   --display:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,'Courier New',monospace;
@@ -18,8 +18,9 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:#FFFFFF;color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5}
-.wrap{max-width:680px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+.wrap{max-width:1160px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:22px 24px}
 a{color:inherit}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--chem);outline-offset:3px}
@@ -43,6 +44,7 @@ h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
 .hero h1{font-size:clamp(40px,11vw,60px);font-weight:800;letter-spacing:.5px}
 .hero p{margin:0;font-family:var(--mono);font-size:15px}
 .opts{display:grid;gap:16px}
+@media (min-width:900px){.opts{grid-template-columns:repeat(3,1fr)}.opts>*{min-height:150px}}
 .opt{display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;text-decoration:none;transition:transform .12s,box-shadow .12s}
 .opt:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
 .opt .ico{width:56px;height:56px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center}
@@ -148,6 +150,7 @@ footer{text-align:center;font-family:var(--mono);font-size:13px;color:var(--mute
 .rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rung,.floaty{animation:none}.rv{opacity:1;transform:none;transition:none}}
 body.wide .wrap{max-width:1160px}
+@media (min-width:980px){#themes{grid-template-columns:1fr 1fr;align-items:start}}
 .hero-grid{display:grid;gap:22px;align-items:center}
 @media (min-width:900px){.hero-grid{grid-template-columns:1.35fr 1fr;gap:36px}.landing{padding:44px 40px}}
 .landing .stats{grid-template-columns:1fr 1fr}
@@ -324,7 +327,7 @@ const app=document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const logo=()=>document.getElementById('logo').innerHTML;
 const header=()=>`<a class="card brand" href="#home">${logo()}<div><h1>TUTLIX</h1><p>IB Classes · Notes · Qbanks</p></div></a>`;
-const footer=()=>`<footer><nav class="fnav" aria-label="Footer"><a href="#biology-notes">Notes</a><a href="biology-qbank.html">Qbank</a><a href="#biology-tutoring">Tutoring</a><a href="#pricing">Pricing</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="refund.html">Refunds</a><a href="#biology">Biology</a><a href="#chemistry">Chemistry</a><a href="#physics">Physics</a><a href="#maths">Maths</a></nav>© Tutlix · Free IB notes, question banks and online tutoring · <a href="mailto:${CONTACT}">${CONTACT}</a></footer>`;
+const footer=()=>`<footer><nav class="fnav" aria-label="Footer"><a href="#biology-notes">Notes</a><a href="biology-qbank.html">Qbank</a><a href="#biology-tutoring">Tutoring</a><a href="#pricing">Pricing</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="refund.html">Refunds</a><a href="#biology">Biology</a><a href="#chemistry">Chemistry</a><a href="#physics">Physics</a><a href="#maths">Maths</a></nav>© Tutlix · IB notes, question banks and online tutoring · <a href="mailto:${CONTACT}">${CONTACT}</a></footer>`;
 const count=(map,s)=>s.themes.reduce((n,t)=>n+t[2].filter(x=>map[x[0]]).length,0);
 const total=s=>s.themes.reduce((n,t)=>n+t[2].length,0);
 
@@ -343,8 +346,8 @@ function home(){
    <div class="hero-grid"><div>
     <span class="label">IB Diploma · SL &amp; HL</span>
     <h1>IB science,<br><mark>made interactive.</mark></h1>
-    <p class="lead">Free notes with 3D models, simulations and games, exam-style question banks, and live 1-to-1 tutoring for Biology, Chemistry, Physics and Maths.</p>
-    <div class="ctas"><a class="btn" href="#biology-notes">Explore free notes ${arrow}</a><a class="btn alt" href="biology-qbank.html">Try the Qbank</a></div>
+    <p class="lead">Interactive notes with 3D models, simulations and games, exam-style question banks, and live 1-to-1 tutoring for Biology, Chemistry, Physics and Maths.</p>
+    <div class="ctas"><a class="btn" href="#biology-notes">Explore the notes ${arrow}</a><a class="btn alt" href="biology-qbank.html">Try the Qbank</a></div>
    </div>
   <div class="heroart" aria-hidden="true"><div class="helix">${Array.from({length:15},(_,i)=>`<div class="rung" style="--i:${i}"><i></i></div>`).join('')}</div>
     <span class="floaty f1">🧬</span><span class="floaty f2">⚗️</span><span class="floaty f3">⚛️</span><span class="floaty f4">📐</span></div>
@@ -374,7 +377,7 @@ function pricing(){
   const m=MEMBERSHIP, save=Math.round((1-m.yearly/(m.monthly*12))*100);
   const inc=['All interactive notes for every topic (SL &amp; HL)','3D models, simulations, virtual labs and games','The full exam-style Qbank with markschemes','Custom timed tests and progress tracking','New topics and subjects as they are added'];
   app.innerHTML=`<nav class="crumbs" aria-label="Breadcrumb"><a href="#home">Home</a><span aria-hidden="true">›</span><span>Pricing</span></nav>
-  <section class="card hero bio"><span class="label">Tutlix membership</span><h1>PRICING</h1><p>Start free. Upgrade for full access to every interactive note and the complete question bank.</p></section>
+  <section class="card hero bio"><span class="label">Tutlix membership</span><h1>PRICING</h1><p>Try 3 topics free. Upgrade for full access to every interactive note and the complete question bank.</p></section>
   <div class="plans">
     <section class="card plan"><span class="label">Monthly</span><div class="amt">$${m.monthly}<small> /month</small></div><p class="secure">Billed monthly. Cancel any time.</p>
       <ul>${inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn" type="button" data-plan="monthly">Get monthly</button></section>
@@ -455,7 +458,7 @@ function hub(k){
   app.innerHTML=crumbs(k)+
   `<section class="card hero ${s.cls}"><span class="label">IB Diploma · SL &amp; HL</span><h1>${s.name.toUpperCase()}</h1><p>${s.blurb}</p></section>
   <div class="opts">
-    ${opt('notes','Notes',n?`Free notes for ${n} of ${t} topics`:`Free notes, topic by topic · coming soon`,'var(--bio)')}
+    ${opt('notes','Notes',n?`Interactive notes for ${n} of ${t} topics`:`Notes, topic by topic · coming soon`,'var(--bio)')}
     ${opt('questions','Questions',q?`Practice sets for ${q} of ${t} topics`:`Exam-style practice by topic · coming soon`,'var(--phys)')}
     ${opt('tutoring','Tutoring',`Live online lessons · $${TRIAL} trial`,'var(--math)')}
   </div>`+footer();
@@ -463,9 +466,9 @@ function hub(k){
 
 function library(k,kind){
   const s=SUBJECTS[k], map=kind==='notes'?NOTES:QUESTIONS;
-  const title=kind==='notes'?'Notes':'Questions', action=kind==='notes'?'Open notes':'Practise';
+  const title=kind==='notes'?'Notes':'Questions', action=kind==='notes'?'Open notes':'Practice';
   app.innerHTML=crumbs(k,title)+
-  `<section class="card hero ${s.cls}"><span class="label">${s.name} · ${kind==='notes'?'Free notes':'Practice questions'}</span><h1>${title.toUpperCase()}</h1><p>${kind==='notes'?'Clear, concise notes for every topic in the IB syllabus.':'Exam-style questions with answers, sorted by topic.'}</p></section>
+  `<section class="card hero ${s.cls}"><span class="label">${s.name} · ${kind==='notes'?'Interactive notes':'Practice questions'}</span><h1>${title.toUpperCase()}</h1><p>${kind==='notes'?'Clear, concise notes for every topic in the IB syllabus.':'Exam-style questions with answers, sorted by topic.'}</p></section>
   <section class="card section"><div class="tools">
     <label for="q" style="flex:1 1 220px"><span class="label" style="font-weight:400">Find a topic</span><input id="q" type="search" placeholder="e.g. enzymes, ${esc(s.themes[0][2][0][0])}" autocomplete="off"></label>
     <div style="display:grid;gap:6px"><span class="label">Level</span><div class="seg" role="group" aria-label="Level">
