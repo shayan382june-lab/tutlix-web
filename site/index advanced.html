@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tutlix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one narrow column of chunky "index cards" on graph paper, like a revision binder. Single light look by choice. */
+:root{
+  --paper:#F3E6D6; --grid:rgba(42,42,46,.07); --ink:#2A2A2E; --card:#FFFDF8; --muted:#57525C;
+  --bio:#FBDF4A; --chem:#3D55F5; --phys:#F25C84; --math:#22D3A5;
+  --display:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;
+  --mono:'Space Mono',ui-monospace,'Courier New',monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+.wrap{max-width:680px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:22px 24px}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--chem);outline-offset:3px}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.brand{display:flex;align-items:center;gap:18px;text-decoration:none}
+.brand h1{font-size:clamp(34px,8vw,44px);font-weight:800;letter-spacing:.5px}
+.brand p{margin:2px 0 0;font-family:var(--mono);font-size:14px}
+.tap{display:flex;align-items:center;justify-content:space-between;gap:16px;text-decoration:none;transition:transform .12s,box-shadow .12s}
+.tap:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.tap:active{transform:translate(3px,3px);box-shadow:3px 3px 0 var(--ink)}
+.tap h2{font-size:clamp(26px,6vw,32px);font-weight:800;letter-spacing:.5px}
+.tap p{margin:4px 0 0;font-family:var(--mono);font-size:14px}
+.go{flex:none;width:48px;height:48px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);display:grid;place-items:center;color:var(--ink)}
+.bio{background:var(--bio)} .chem{background:var(--chem);color:#fff} .phys{background:var(--phys)} .math{background:var(--math)}
+.back{font-family:var(--mono);font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;align-self:flex-start}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-family:var(--mono);font-size:14px}
+.crumbs a{text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.crumbs a:hover{text-decoration:underline}
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero h1{font-size:clamp(40px,11vw,60px);font-weight:800;letter-spacing:.5px}
+.hero p{margin:0;font-family:var(--mono);font-size:15px}
+.opts{display:grid;gap:16px}
+.opt{display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;text-decoration:none;transition:transform .12s,box-shadow .12s}
+.opt:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.opt .ico{width:56px;height:56px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center}
+.opt h2{font-size:24px;font-weight:800}
+.opt p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.section h2{font-size:24px;font-weight:800;margin-bottom:12px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tools input{flex:1 1 220px}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{font:700 14px var(--mono);border:0;background:transparent;color:var(--ink);padding:0 14px;min-height:44px;cursor:pointer}
+.seg button+button{border-left:2px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.theme h3{font-size:19px;font-weight:800;margin:0 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.theme h3 small{font:400 13px var(--mono);color:var(--muted)}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.item{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;border:2px solid var(--ink);border-radius:12px;padding:10px 12px;background:var(--card);min-height:52px}
+.item .code{font:700 13px var(--mono)}
+.item .name{min-width:0}
+.hl{font:700 11px var(--mono);border:2px solid var(--ink);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:2px;background:var(--phys)}
+.status{font:400 12px var(--mono);color:var(--muted);white-space:nowrap}
+.open{font:700 13px var(--mono);text-decoration:none;border:2px solid var(--ink);border-radius:10px;padding:6px 12px;background:var(--bio);box-shadow:2px 2px 0 var(--ink);white-space:nowrap;min-height:40px;display:inline-flex;align-items:center}
+.empty{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 22px;border:3px solid var(--ink);border-radius:12px;background:var(--bio);color:var(--ink);font:800 17px var(--display);box-shadow:4px 4px 0 var(--ink);cursor:pointer;text-decoration:none}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.price{display:flex;flex-wrap:wrap;gap:14px}
+.price>div{flex:1 1 170px;border:3px solid var(--ink);border-radius:14px;padding:14px 16px;background:var(--card)}
+.price .amt{font-size:34px;font-weight:800;line-height:1;margin-top:4px}
+.price .amt small{font:400 14px var(--mono)}
+form{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label{display:grid;gap:6px;font-weight:700;font-size:15px}
+input,select,textarea{font:16px var(--mono);color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:10px;padding:10px 12px;min-height:46px;width:100%}
+textarea{min-height:90px;resize:vertical}
+.note{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0}
+.ok{border:3px solid var(--ink);border-radius:12px;background:var(--math);padding:12px 14px;font-weight:700}
+footer{text-align:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+@media (max-width:440px){.item{grid-template-columns:52px 1fr}.item .end{grid-column:2}.opt{grid-template-columns:48px 1fr}.opt .go{display:none}.opt .ico{width:48px;height:48px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.plan{display:flex;flex-direction:column;gap:10px;position:relative}
+.plan.best{background:var(--bio)}
+.plan .badge{position:absolute;top:-14px;right:16px;font:700 12px var(--mono);background:var(--phys);border:2px solid var(--ink);border-radius:999px;padding:2px 10px}
+.plan .amt{font-size:46px;font-weight:800;line-height:1}.plan .amt small{font:400 15px var(--mono)}
+.plan ul{margin:0;padding-left:20px;font-size:15px}.plan li{margin:4px 0}
+.cmp{width:100%;border-collapse:collapse;font-size:15px}.cmp th,.cmp td{border-bottom:2px solid #E7DCCB;padding:10px 6px;text-align:left}.cmp th{font:700 12px var(--mono);text-transform:uppercase}.cmp td:not(:first-child),.cmp th:not(:first-child){text-align:center;width:90px}
+.faq details{border:2px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);margin-bottom:10px}.faq summary{font-weight:700;cursor:pointer}.faq p{margin:8px 0 0;color:var(--muted)}
+.secure{font:13px var(--mono);color:var(--muted);margin:0}
+.soon{font:700 11px var(--mono);vertical-align:middle;background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:2px 10px;margin-left:8px;letter-spacing:0}
+.memb{background:var(--math)}
+/* top navigation bar */
+.topbar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 4px 0 rgba(42,42,46,.12)}
+.topbar .in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px max(16px,env(safe-area-inset-left,0px))}
+.tb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 24px var(--display);letter-spacing:.5px}
+.tb-brand svg{width:40px;height:40px}
+.tb-nav{display:flex;align-items:center;gap:4px;margin-left:auto}
+.tb-nav a,.tb-nav button.dd{font:700 15px var(--display);text-decoration:none;color:var(--ink);padding:8px 12px;border-radius:10px;border:2px solid transparent;background:none;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.tb-nav a:hover,.tb-nav button.dd:hover{border-color:var(--ink);background:var(--paper)}
+.tb-nav a.on{border-color:var(--ink);background:var(--bio)}
+.tb-nav a.cta{background:var(--bio);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);margin-left:6px}
+.tb-nav a.cta:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.ddwrap{position:relative}
+.ddmenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:var(--card);border:3px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:6px;display:none}
+.ddwrap.ddopen .ddmenu{display:grid}
+.ddmenu a{justify-content:flex-start}
+.ddmenu .dot{width:14px;height:14px;border:2px solid var(--ink);border-radius:50%;flex:none}
+.tb-burger{display:none;margin-left:auto;width:46px;height:46px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;place-items:center}
+@media (max-width:760px){
+ .tb-burger{display:grid}
+ .tb-nav{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;background:var(--card);border-bottom:3px solid var(--ink);padding:10px 16px 16px;gap:4px}
+ .topbar.mopen .tb-nav{display:flex}
+ .tb-nav a.cta{margin:6px 0 0;justify-content:center}
+ .ddmenu{position:static;box-shadow:none;border-width:2px;margin:4px 0 0}
+}
+/* landing page */
+.landing{padding:28px 24px 26px;background:var(--card);position:relative;overflow:hidden}
+.landing h1{max-width:560px;font-size:clamp(38px,9vw,58px);font-weight:800;line-height:1.02;margin:8px 0 12px;letter-spacing:.3px}
+.landing h1 mark{background:var(--bio);padding:0 6px;border:3px solid var(--ink);border-radius:10px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.landing p.lead{font-family:var(--mono);font-size:15px;margin:0 0 18px;max-width:520px}
+.landing .ctas{display:flex;flex-wrap:wrap;gap:12px}
+.btn.alt{background:var(--card)}
+.landing .blob{position:absolute;right:-56px;top:-56px;width:140px;height:140px;border-radius:50%;background:var(--math);border:3px solid var(--ink);z-index:0}
+.landing .blob2{position:absolute;right:92px;top:14px;width:30px;height:30px;border-radius:50%;background:var(--phys);border:3px solid var(--ink)}
+.landing>*:not(.blob):not(.blob2){position:relative;z-index:1}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{border:3px solid var(--ink);border-radius:14px;background:var(--card);padding:12px 14px;box-shadow:3px 3px 0 var(--ink)}
+.stat b{display:block;font-size:24px;font-weight:800;line-height:1.1}
+.stat span{font:400 12px var(--mono)}
+.sechead{font-size:26px;font-weight:800;margin:6px 0 -6px}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.feat{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-decoration:none;transition:transform .12s,box-shadow .12s}.feat:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.feat .ico{width:48px;height:48px;border:3px solid var(--ink);border-radius:12px;display:grid;place-items:center}
+.feat h3{font-size:20px;font-weight:800}
+.feat p{margin:0;color:var(--muted);font-size:15px}
+.fnav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:6px}
+.fnav a{text-decoration:none;font:700 13px var(--mono)}
+.fnav a:hover{text-decoration:underline}
+</style>
+
+</head>
+<body>
+<header class="topbar" id="topbar"><div class="in"><a class="tb-brand" href="#home" aria-label="Tutlix home"><span id="tbLogo"></span>TUTLIX</a><button class="tb-burger" type="button" id="tbBurger" aria-label="Open menu" aria-expanded="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><nav class="tb-nav" id="tbNav" aria-label="Main"><div class="ddwrap" id="tbDD"><button class="dd" type="button" aria-expanded="false" aria-haspopup="true">Subjects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="ddmenu" role="menu"><a role="menuitem" href="#biology"><span class="dot" style="background:var(--bio)"></span>Biology</a><a role="menuitem" href="#chemistry"><span class="dot" style="background:var(--chem)"></span>Chemistry</a><a role="menuitem" href="#physics"><span class="dot" style="background:var(--phys)"></span>Physics</a><a role="menuitem" href="#maths"><span class="dot" style="background:var(--math)"></span>Maths</a></div></div><a href="#biology-notes" data-nav="notes">Notes</a><a href="biology-qbank.html" data-nav="qbank">Qbank</a><a href="#biology-tutoring" data-nav="tutoring">Tutoring</a><a href="#pricing" data-nav="pricing">Pricing</a><a class="cta" href="#biology-tutoring">Book a $5 trial</a></nav></div></header><div class="wrap" id="app"></div>
+
+<!-- Lets Netlify detect the booking form at upload time -->
+<form name="trial" data-netlify="true" hidden><input name="name"><input name="email"><select name="subject"></select><select name="level"></select><input name="timezone"><textarea name="message"></textarea></form>
+
+<template id="logo"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#FBDF4A" stroke="#2A2A2E" stroke-width="3"/><circle cx="32" cy="32" r="20" fill="#FFFDF8" stroke="#2A2A2E" stroke-width="3"/><g fill="none" stroke="#2A2A2E" stroke-width="3" stroke-linecap="round"><path d="M26 20 C 38 26, 26 38, 38 44"/><path d="M38 20 C 26 26, 38 38, 26 44"/><line x1="28" y1="25" x2="36" y2="25"/><line x1="28" y1="39" x2="36" y2="39"/></g></svg></template>
+
+<script>
+/* ==== EDIT HERE ====
+   Prices, and links to notes/questions.
+   To publish a file, put its link in NOTES or QUESTIONS using the topic code, e.g.
+   NOTES = { 'A1.1': 'https://drive.google.com/...' }                              */
+const PRICE = 20, TRIAL = 5;
+/* Membership prices (USD). Change here any time. */
+const MEMBERSHIP = { monthly: 9.99, yearly: 69 };
+const CONTACT = 'tutlix.ceo@gmail.com';
+/* Paddle checkout: fill these in once Paddle is approved (client-side token + price IDs). */
+const PADDLE = { token: '', monthly: '', yearly: '' };
+const NOTES = {
+  'A1.1': 'biology-a1-1-water.html',
+  'A1.2': 'biology-a1-2-nucleic-acids.html',
+  'A2.1': 'biology-a2-1-origins-of-cells.html',
+  'A2.2': 'biology-a2-2-cell-structure.html',
+  'A2.3': 'biology-a2-3-viruses.html',
+  'A3.1': 'biology-a3-1-diversity-of-organisms.html',
+  'A3.2': 'biology-a3-2-classification-and-cladistics.html',
+  'A4.1': 'biology-a4-1-evolution-and-speciation.html',
+  'A4.2': 'biology-a4-2-conservation-of-biodiversity.html',
+  'B1.1': 'biology-b1-1-carbohydrates-and-lipids.html',
+  'B1.2': 'biology-b1-2-proteins.html',
+  'B2.1': 'biology-b2-1-membranes-and-membrane-transport.html',
+  'B2.2': 'biology-b2-2-organelles-and-compartmentalization.html',
+  'B2.3': 'biology-b2-3-cell-specialization.html',
+  'B3.1': 'biology-b3-1-gas-exchange.html',
+  'B3.2': 'biology-b3-2-transport.html',
+  'B3.3': 'biology-b3-3-muscle-and-motility.html',
+  'B4.1': 'biology-b4-1-adaptation-to-environment.html',
+  'B4.2': 'biology-b4-2-ecological-niches.html',
+  'C1.1': 'biology-c1-1-enzymes-and-metabolism.html',
+  'C1.2': 'biology-c1-2-cell-respiration.html',
+  'C1.3': 'biology-c1-3-photosynthesis.html',
+  'C2.1': 'biology-c2-1-chemical-signalling.html',
+  'C2.2': 'biology-c2-2-neural-signalling.html',
+  'C3.1': 'biology-c3-1-integration-of-body-systems.html',
+  'C3.2': 'biology-c3-2-defence-against-disease.html',
+  'C4.1': 'biology-c4-1-populations-and-communities.html',
+  'C4.2': 'biology-c4-2-transfers-of-energy-and-matter.html',
+  'D1.1': 'biology-d1-1-dna-replication.html',
+  'D1.2': 'biology-d1-2-protein-synthesis.html',
+  'D1.3': 'biology-d1-3-mutations-and-gene-editing.html',
+  'D2.1': 'biology-d2-1-cell-and-nuclear-division.html',
+  'D2.2': 'biology-d2-2-gene-expression.html',
+  'D2.3': 'biology-d2-3-water-potential.html',
+  'D3.1': 'biology-d3-1-reproduction.html',
+  'D3.2': 'biology-d3-2-inheritance.html',
+  'D3.3': 'biology-d3-3-homeostasis.html',
+  'D4.1': 'biology-d4-1-natural-selection.html',
+  'D4.2': 'biology-d4-2-stability-and-change.html',
+  'D4.3': 'biology-d4-3-climate-change.html'
+};
+const QUESTIONS = {
+  'A1.1': 'biology-qbank.html#A1.1',
+  'A1.2': 'biology-qbank.html#A1.2',
+  'A2.1': 'biology-qbank.html#A2.1',
+  'A2.2': 'biology-qbank.html#A2.2',
+  'A2.3': 'biology-qbank.html#A2.3',
+  'A3.1': 'biology-qbank.html#A3.1',
+  'A3.2': 'biology-qbank.html#A3.2',
+  'A4.1': 'biology-qbank.html#A4.1',
+  'A4.2': 'biology-qbank.html#A4.2',
+  'B1.1': 'biology-qbank.html#B1.1',
+  'B1.2': 'biology-qbank.html#B1.2',
+  'B2.1': 'biology-qbank.html#B2.1',
+  'B2.2': 'biology-qbank.html#B2.2',
+  'B2.3': 'biology-qbank.html#B2.3',
+  'B3.1': 'biology-qbank.html#B3.1',
+  'B3.2': 'biology-qbank.html#B3.2',
+  'B3.3': 'biology-qbank.html#B3.3',
+  'B4.1': 'biology-qbank.html#B4.1',
+  'B4.2': 'biology-qbank.html#B4.2',
+  'C1.1': 'biology-qbank.html#C1.1',
+  'C1.2': 'biology-qbank.html#C1.2',
+  'C1.3': 'biology-qbank.html#C1.3',
+  'C2.1': 'biology-qbank.html#C2.1',
+  'C2.2': 'biology-qbank.html#C2.2',
+  'C3.1': 'biology-qbank.html#C3.1',
+  'C3.2': 'biology-qbank.html#C3.2',
+  'C4.1': 'biology-qbank.html#C4.1',
+  'C4.2': 'biology-qbank.html#C4.2',
+  'D1.1': 'biology-qbank.html#D1.1',
+  'D1.2': 'biology-qbank.html#D1.2',
+  'D1.3': 'biology-qbank.html#D1.3',
+  'D2.1': 'biology-qbank.html#D2.1',
+  'D2.2': 'biology-qbank.html#D2.2',
+  'D2.3': 'biology-qbank.html#D2.3',
+  'D3.1': 'biology-qbank.html#D3.1',
+  'D3.2': 'biology-qbank.html#D3.2',
+  'D3.3': 'biology-qbank.html#D3.3',
+  'D4.1': 'biology-qbank.html#D4.1',
+  'D4.2': 'biology-qbank.html#D4.2',
+  'D4.3': 'biology-qbank.html#D4.3',
+};
+
+/* Topics follow the IB Diploma syllabus (first exams 2025 for the sciences, 2021 for maths). h = HL only */
+const SUBJECTS = {
+  biology:{name:'Biology',cls:'bio',blurb:'From molecules to ecosystems, taught theme by theme.',themes:[
+    ['A','Unity and diversity',[['A1.1','Water'],['A1.2','Nucleic acids'],['A2.1','Origins of cells',1],['A2.2','Cell structure'],['A2.3','Viruses',1],['A3.1','Diversity of organisms'],['A3.2','Classification and cladistics',1],['A4.1','Evolution and speciation'],['A4.2','Conservation of biodiversity']]],
+    ['B','Form and function',[['B1.1','Carbohydrates and lipids'],['B1.2','Proteins'],['B2.1','Membranes and membrane transport'],['B2.2','Organelles and compartmentalization'],['B2.3','Cell specialization'],['B3.1','Gas exchange'],['B3.2','Transport'],['B3.3','Muscle and motility',1],['B4.1','Adaptation to environment'],['B4.2','Ecological niches']]],
+    ['C','Interaction and interdependence',[['C1.1','Enzymes and metabolism'],['C1.2','Cell respiration'],['C1.3','Photosynthesis'],['C2.1','Chemical signalling',1],['C2.2','Neural signalling'],['C3.1','Integration of body systems'],['C3.2','Defence against disease'],['C4.1','Populations and communities'],['C4.2','Transfers of energy and matter']]],
+    ['D','Continuity and change',[['D1.1','DNA replication'],['D1.2','Protein synthesis'],['D1.3','Mutations and gene editing'],['D2.1','Cell and nuclear division'],['D2.2','Gene expression',1],['D2.3','Water potential'],['D3.1','Reproduction'],['D3.2','Inheritance'],['D3.3','Homeostasis'],['D4.1','Natural selection'],['D4.2','Stability and change'],['D4.3','Climate change']]]]},
+  chemistry:{name:'Chemistry',cls:'chem',blurb:'Structure and reactivity, with lots of worked calculations.',themes:[
+    ['Structure 1','Models of the particulate nature of matter',[['S1.1','Introduction to the particulate nature of matter'],['S1.2','The nuclear atom'],['S1.3','Electron configurations'],['S1.4','Counting particles by mass: the mole'],['S1.5','Ideal gases']]],
+    ['Structure 2','Models of bonding and structure',[['S2.1','The ionic model'],['S2.2','The covalent model'],['S2.3','The metallic model'],['S2.4','From models to materials']]],
+    ['Structure 3','Classification of matter',[['S3.1','The periodic table'],['S3.2','Functional groups']]],
+    ['Reactivity 1','What drives chemical reactions?',[['R1.1','Measuring enthalpy changes'],['R1.2','Energy cycles in reactions'],['R1.3','Energy from fuels'],['R1.4','Entropy and spontaneity',1]]],
+    ['Reactivity 2','How much, how fast and how far?',[['R2.1','How much? The amount of chemical change'],['R2.2','How fast? The rate of chemical change'],['R2.3','How far? The extent of chemical change']]],
+    ['Reactivity 3','What are the mechanisms of chemical change?',[['R3.1','Proton transfer reactions'],['R3.2','Electron transfer reactions'],['R3.3','Electron sharing reactions'],['R3.4','Electron-pair sharing reactions']]]]},
+  physics:{name:'Physics',cls:'phys',blurb:'Concepts first, then the exam-style problems.',themes:[
+    ['A','Space, time and motion',[['A.1','Kinematics'],['A.2','Forces and momentum'],['A.3','Work, energy and power'],['A.4','Rigid body mechanics',1],['A.5','Galilean and special relativity',1]]],
+    ['B','The particulate nature of matter',[['B.1','Thermal energy transfers'],['B.2','Greenhouse effect'],['B.3','Gas laws'],['B.4','Thermodynamics',1],['B.5','Current and circuits']]],
+    ['C','Wave behaviour',[['C.1','Simple harmonic motion'],['C.2','Wave model'],['C.3','Wave phenomena'],['C.4','Standing waves and resonance'],['C.5','Doppler effect']]],
+    ['D','Fields',[['D.1','Gravitational fields'],['D.2','Electric and magnetic fields'],['D.3','Motion in electromagnetic fields'],['D.4','Induction',1]]],
+    ['E','Nuclear and quantum physics',[['E.1','Structure of the atom'],['E.2','Quantum physics',1],['E.3','Radioactive decay'],['E.4','Fission'],['E.5','Fusion and stars']]]]},
+  maths:{name:'Maths',cls:'math',blurb:'Analysis & Approaches (AA) and Applications & Interpretation (AI).',themes:[
+    ['AA','Analysis and Approaches',[['AA1','Number and algebra'],['AA2','Functions'],['AA3','Geometry and trigonometry'],['AA4','Statistics and probability'],['AA5','Calculus']]],
+    ['AI','Applications and Interpretation',[['AI1','Number and algebra'],['AI2','Functions'],['AI3','Geometry and trigonometry'],['AI4','Statistics and probability'],['AI5','Calculus']]]]}
+};
+
+const arrow='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+const ICONS={
+  notes:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/></svg>',
+  questions:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14"/><path d="M12 17.5v.01"/></svg>',
+  tutoring:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><circle cx="12" cy="9" r="2"/><path d="M8.5 14a3.5 3.5 0 0 1 7 0"/></svg>'
+};
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const logo=()=>document.getElementById('logo').innerHTML;
+const header=()=>`<a class="card brand" href="#home">${logo()}<div><h1>TUTLIX</h1><p>IB Classes · Notes · Qbanks</p></div></a>`;
+const footer=()=>`<footer><nav class="fnav" aria-label="Footer"><a href="#biology-notes">Notes</a><a href="biology-qbank.html">Qbank</a><a href="#biology-tutoring">Tutoring</a><a href="#pricing">Pricing</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="refund.html">Refunds</a><a href="#biology">Biology</a><a href="#chemistry">Chemistry</a><a href="#physics">Physics</a><a href="#maths">Maths</a></nav>© Tutlix · Free IB notes, question banks and online tutoring · <a href="mailto:${CONTACT}">${CONTACT}</a></footer>`;
+const count=(map,s)=>s.themes.reduce((n,t)=>n+t[2].filter(x=>map[x[0]]).length,0);
+const total=s=>s.themes.reduce((n,t)=>n+t[2].length,0);
+
+function home(){
+  const bioN=count(NOTES,SUBJECTS.biology);
+  const feat=(href,bg,ico,t,d)=>`<a class="card feat" href="${href}"><span class="ico" style="background:${bg}">${ico}</span><h3>${t}</h3><p>${d}</p></a>`;
+  app.innerHTML=
+  `<section class="card landing"><span class="blob" aria-hidden="true"></span><span class="blob2" aria-hidden="true"></span>
+    <span class="label">IB Diploma · SL &amp; HL</span>
+    <h1>IB science, <mark>made interactive.</mark></h1>
+    <p class="lead">Free notes with 3D models, simulations and games, exam-style question banks, and live 1-to-1 tutoring for Biology, Chemistry, Physics and Maths.</p>
+    <div class="ctas"><a class="btn" href="#biology-notes">Explore free notes ${arrow}</a><a class="btn alt" href="biology-qbank.html">Try the Qbank</a><a class="btn alt" href="#pricing">See membership</a></div>
+  </section>
+  <div class="stats">
+    <div class="stat"><b>${bioN}</b><span>interactive Biology topics</span></div>
+    <div class="stat"><b>3D</b><span>models, sims &amp; games</span></div>
+    <div class="stat"><b>440+</b><span>exam-style Biology questions</span></div>
+    <div class="stat"><b>$${PRICE}/hr</b><span>live 1-to-1 lessons</span></div>
+  </div>
+  <h2 class="sechead">Choose your subject</h2>`+
+  Object.entries(SUBJECTS).map(([k,s])=>`<a class="card tap ${s.cls}" href="#${k}"><div><h2>${s.name.toUpperCase()}${count(NOTES,s)?'':' <span class="soon">Coming soon</span>'}</h2><p>${count(NOTES,s)?`SL &amp; HL · ${count(NOTES,s)} interactive topics · Qbank · tutoring`:'Notes and questions in progress · tutoring available'}</p></div><span class="go">${arrow}</span></a>`).join('')+
+  `<section class="card section memb"><span class="label">Tutlix membership</span><h2 style="margin:6px 0 4px">Unlock everything from $${MEMBERSHIP.monthly}/month</h2><p style="margin:0 0 14px;font-family:var(--mono);font-size:14px">Full access to every interactive note and the complete Qbank. Cancel any time · 14-day money-back guarantee.</p><a class="btn" href="#pricing">See plans ${arrow}</a></section>
+  <h2 class="sechead">Why students use Tutlix</h2>
+  <div class="feats">
+    ${feat('#biology-notes','var(--bio)',ICONS.notes,'Notes you can play with','Rotate 3D molecules, run virtual labs and play games that make each topic stick.')}
+    ${feat('biology-qbank.html','var(--phys)',ICONS.questions,'Exam-style Qbank','Paper 1 and Paper 2 style questions with instant feedback and full markschemes.')}
+    ${feat('#biology-tutoring','var(--math)',ICONS.tutoring,'Live tutoring','1-to-1 online lessons with experienced IB tutors. Start with a $'+TRIAL+' trial.')}
+  </div>
+  <section class="card section" id="about"><h2>About Tutlix</h2><p style="margin:0 0 10px">Tutlix is an independent online learning platform for IB Diploma students, built by experienced IB science tutors. Our interactive notes and question banks follow the current IB syllabus topic by topic, and our tutors offer live 1-to-1 lessons for students who want extra help.</p>
+  <p style="margin:0"><b>Contact:</b> <a href="mailto:${CONTACT}">${CONTACT}</a> · we reply within 24 hours.</p></section>`+
+  footer();
+}
+
+function pricing(){
+  const m=MEMBERSHIP, save=Math.round((1-m.yearly/(m.monthly*12))*100);
+  const inc=['All interactive notes for every topic (SL &amp; HL)','3D models, simulations, virtual labs and games','The full exam-style Qbank with markschemes','Custom timed tests and progress tracking','New topics and subjects as they are added'];
+  app.innerHTML=`<nav class="crumbs" aria-label="Breadcrumb"><a href="#home">Home</a><span aria-hidden="true">›</span><span>Pricing</span></nav>
+  <section class="card hero bio"><span class="label">Tutlix membership</span><h1>PRICING</h1><p>Start free. Upgrade for full access to every interactive note and the complete question bank.</p></section>
+  <div class="plans">
+    <section class="card plan"><span class="label">Monthly</span><div class="amt">$${m.monthly}<small> /month</small></div><p class="secure">Billed monthly. Cancel any time.</p>
+      <ul>${inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn" type="button" data-plan="monthly">Get monthly</button></section>
+    <section class="card plan best"><span class="badge">Save ${save}%</span><span class="label">Yearly</span><div class="amt">$${m.yearly}<small> /year</small></div><p class="secure" style="color:var(--ink)">Just $${(m.yearly/12).toFixed(2)} a month, billed yearly.</p>
+      <ul>${inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn alt" type="button" data-plan="yearly">Get yearly</button></section>
+  </div>
+  <p id="payMsg" class="ok" hidden></p>
+  <p class="secure" style="text-align:center">🔒 Secure checkout by Paddle, our reseller and Merchant of Record. Prices in USD; tax may be added depending on your country. 14-day money-back guarantee.</p>
+  <section class="card section"><h2>Free vs member</h2><table class="cmp"><thead><tr><th></th><th>Free</th><th>Member</th></tr></thead><tbody>
+    <tr><td>60-second summaries and key terms</td><td>✓</td><td>✓</td></tr>
+    <tr><td>3D model and first section of every notes topic</td><td>✓</td><td>✓</td></tr>
+    <tr><td>All remaining sections, simulations and games</td><td>–</td><td>✓</td></tr>
+    <tr><td>Qbank sample questions in every topic</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Full Qbank with Paper 2 questions and markschemes</td><td>–</td><td>✓</td></tr>
+    <tr><td>Custom timed tests</td><td>Free questions</td><td>✓</td></tr></tbody></table></section>
+  <section class="card section faq"><h2>Questions</h2>
+    <details><summary>How do I get access after paying?</summary><p>You receive a personal access code. Enter it in the 🔒 box on any notes or Qbank page and everything unlocks on that device. Each code works on up to 2 devices.</p></details>
+    <details><summary>Can I cancel?</summary><p>Yes, any time, from the link in your receipt email or by contacting us. You keep access until the end of the period you paid for.</p></details>
+    <details><summary>Is there a refund?</summary><p>Yes. Every membership comes with a 14-day money-back guarantee. See our <a href="refund.html">Refund Policy</a>.</p></details>
+    <details><summary>Which subjects are included?</summary><p>IB Biology is complete (all 40 topics, SL and HL). Chemistry, Physics and Maths are being added, and members get them at no extra cost.</p></details>
+    <details><summary>Is 1-to-1 tutoring included?</summary><p>No. Live lessons are booked separately ($${PRICE}/hour, $${TRIAL} trial) on the <a href="#biology-tutoring">tutoring page</a>.</p></details>
+  </section>`+footer();
+  document.querySelectorAll('[data-plan]').forEach(b=>b.addEventListener('click',()=>openCheckout(b.dataset.plan)));
+}
+function openCheckout(plan){
+  const msg=document.getElementById('payMsg');
+  if(window.Paddle&&PADDLE.token&&PADDLE[plan]){Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}]});return;}
+  if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}
+}
+
+function crumbs(k,last){
+  const s=SUBJECTS[k];
+  return `<nav class="crumbs" aria-label="Breadcrumb"><a href="#home">Home</a><span aria-hidden="true">›</span>${last?`<a href="#${k}">${s.name}</a><span aria-hidden="true">›</span><span>${last}</span>`:`<span>${s.name}</span>`}</nav>`;
+}
+
+function hub(k){
+  const s=SUBJECTS[k], n=count(NOTES,s), q=count(QUESTIONS,s), t=total(s);
+  const opt=(id,title,desc,bg)=>`<a class="card opt" href="#${k}-${id}"><span class="ico" style="background:${bg}">${ICONS[id]}</span><div><h2>${title}</h2><p>${desc}</p></div><span class="go">${arrow}</span></a>`;
+  app.innerHTML=crumbs(k)+
+  `<section class="card hero ${s.cls}"><span class="label">IB Diploma · SL &amp; HL</span><h1>${s.name.toUpperCase()}</h1><p>${s.blurb}</p></section>
+  <div class="opts">
+    ${opt('notes','Notes',n?`Free notes for ${n} of ${t} topics`:`Free notes, topic by topic · coming soon`,'var(--bio)')}
+    ${opt('questions','Questions',q?`Practice sets for ${q} of ${t} topics`:`Exam-style practice by topic · coming soon`,'var(--phys)')}
+    ${opt('tutoring','Tutoring',`Live online lessons · $${TRIAL} trial`,'var(--math)')}
+  </div>`+footer();
+}
+
+function library(k,kind){
+  const s=SUBJECTS[k], map=kind==='notes'?NOTES:QUESTIONS;
+  const title=kind==='notes'?'Notes':'Questions', action=kind==='notes'?'Open notes':'Practise';
+  app.innerHTML=crumbs(k,title)+
+  `<section class="card hero ${s.cls}"><span class="label">${s.name} · ${kind==='notes'?'Free notes':'Practice questions'}</span><h1>${title.toUpperCase()}</h1><p>${kind==='notes'?'Clear, concise notes for every topic in the IB syllabus.':'Exam-style questions with answers, sorted by topic.'}</p></section>
+  <section class="card section"><div class="tools">
+    <label for="q" style="flex:1 1 220px"><span class="label" style="font-weight:400">Find a topic</span><input id="q" type="search" placeholder="e.g. enzymes, ${esc(s.themes[0][2][0][0])}" autocomplete="off"></label>
+    <div style="display:grid;gap:6px"><span class="label">Level</span><div class="seg" role="group" aria-label="Level">
+      <button type="button" data-lv="all" aria-pressed="true">All</button><button type="button" data-lv="sl" aria-pressed="false">SL</button><button type="button" data-lv="hl" aria-pressed="false">HL only</button></div></div>
+  </div></section>
+  <div id="themes" style="display:grid;gap:22px"></div>`+footer();
+  let lv='all';
+  const draw=()=>{
+    const f=document.getElementById('q').value.trim().toLowerCase();
+    const html=s.themes.map(([code,name,items])=>{
+      const rows=items.filter(([c,n,h])=>(lv==='all'||(lv==='hl'?h:!h))&&(!f||(c+' '+n).toLowerCase().includes(f)));
+      if(!rows.length) return '';
+      return `<section class="card theme"><h3>${esc(code.length===1?'Theme '+code:code)}<small>${esc(name)}</small></h3><ul class="list">${rows.map(([c,n,h])=>`<li class="item"><span class="code">${c}</span><span class="name">${esc(n)}${h?'<span class="hl">HL</span>':''}</span><span class="end">${map[c]?`<a class="open" href="${esc(map[c])}"${/^https?:/.test(map[c])?' target="_blank" rel="noopener"':''}>${action} →</a>`:'<span class="status">Coming soon</span>'}</span></li>`).join('')}</ul></section>`;
+    }).join('');
+    document.getElementById('themes').innerHTML=html||'<p class="card empty">No topics match. Try a different word.</p>';
+  };
+  document.getElementById('q').addEventListener('input',draw);
+  app.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{lv=b.dataset.lv;app.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw();}));
+  draw();
+}
+
+function tutoring(k){
+  const s=SUBJECTS[k];
+  const opts=Object.entries(SUBJECTS).map(([key,x])=>`<option${key===k?' selected':''}>${x.name}</option>`).join('');
+  app.innerHTML=crumbs(k,'Tutoring')+
+  `<section class="card hero ${s.cls}"><span class="label">${s.name} · Live online lessons</span><h1>TUTORING</h1><p>1-to-1 lessons for SL and HL, built around the IB syllabus.</p></section>
+  <section class="card section"><h2>Prices</h2><div class="price">
+    <div><span class="label">Trial · 30 min</span><div class="amt">$${TRIAL}</div></div>
+    <div><span class="label">1-to-1 · 60 min</span><div class="amt">$${PRICE}<small> /hour</small></div></div>
+    <div><span class="label">Small groups</span><div class="amt" style="font-size:22px;margin-top:10px">Ask us</div></div>
+  </div></section>
+  <section class="card section"><h2>Book a $${TRIAL} trial</h2>
+  <form name="trial" method="POST" data-netlify="true" id="trialForm">
+    <input type="hidden" name="form-name" value="trial">
+    <div class="row"><label for="f-name">Student name<input id="f-name" name="name" required autocomplete="name"></label>
+    <label for="f-email">Email<input id="f-email" name="email" type="email" required autocomplete="email"></label></div>
+    <div class="row"><label for="f-subject">Subject<select id="f-subject" name="subject">${opts}</select></label>
+    <label for="f-level">Level<select id="f-level" name="level"><option>SL</option><option>HL</option><option>Not sure yet</option></select></label></div>
+    <label for="f-tz">Country / time zone<input id="f-tz" name="timezone" placeholder="e.g. Dubai, GMT+4"></label>
+    <label for="f-msg">What do you need help with?<textarea id="f-msg" name="message" placeholder="Topics, upcoming tests, target grade…"></textarea></label>
+    <div><button class="btn" type="submit">Request my trial</button></div>
+    <p class="note">We reply within 24 hours with a lesson time and payment details. Lessons are arranged and invoiced directly by your tutor and are separate from the Tutlix membership. Questions? Email ${CONTACT}.</p>
+    <div id="formMsg" hidden class="ok"></div>
+  </form></section>`+footer();
+}
+
+function navState(h){const tb=document.getElementById('topbar');if(!tb)return;tb.classList.remove('mopen');document.getElementById('tbBurger').setAttribute('aria-expanded','false');document.getElementById('tbDD').classList.remove('ddopen');
+  const sub=h==='pricing'?'pricing':(h.split('-')[1]||'');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('on',a.dataset.nav===(sub==='questions'?'qbank':sub)));}
+(function(){const tb=document.getElementById('topbar');if(!tb)return;document.getElementById('tbLogo').innerHTML=logo();
+  const bg=document.getElementById('tbBurger');bg.addEventListener('click',()=>{const o=tb.classList.toggle('mopen');bg.setAttribute('aria-expanded',String(o));});
+  const dd=document.getElementById('tbDD');dd.querySelector('button').addEventListener('click',e=>{e.stopPropagation();const o=dd.classList.toggle('ddopen');e.currentTarget.setAttribute('aria-expanded',String(o));});
+  document.addEventListener('click',e=>{if(!dd.contains(e.target))dd.classList.remove('ddopen');});
+  tb.querySelectorAll('.tb-nav a').forEach(a=>a.addEventListener('click',()=>{tb.classList.remove('mopen');dd.classList.remove('ddopen');}));})();
+function route(){
+  const h=(location.hash||'#home').slice(1);navState(h);
+  if(h==='pricing'){pricing();window.scrollTo(0,0);return;}
+  const [k,sub]=h.split('-');
+  if(SUBJECTS[k]){ if(sub==='notes'||sub==='questions') library(k,sub); else if(sub==='tutoring') tutoring(k); else hub(k); }
+  else home();
+  window.scrollTo(0,0);
+}
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='trialForm') return;
+  e.preventDefault();
+  const f=e.target, m=document.getElementById('formMsg'), btn=f.querySelector('button[type=submit]');
+  if(!/tutlix|netlify/.test(location.hostname)){ m.hidden=false; m.textContent='Preview only. On the live site, this request is sent to your Tutlix inbox.'; return; }
+  btn.disabled=true; btn.textContent='Sending…';
+  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
+    .then(r=>{ if(!r.ok) throw new Error(r.status);
+      f.querySelectorAll('input:not([type=hidden]),select,textarea,button').forEach(x=>x.closest('.row,label,div:not(#formMsg)')&&(x.disabled=true));
+      m.hidden=false; m.textContent='Thanks, your request is in! We will email you within 24 hours with a lesson time and payment details. Check your spam folder if you don\'t see it.';
+      btn.textContent='Request sent'; })
+    .catch(()=>{ btn.disabled=false; btn.textContent='Request my trial'; m.hidden=false; m.style.background='var(--phys)'; m.textContent='Sorry, that didn\'t send. Check your internet connection and try again.'; });
+});
+window.addEventListener('hashchange',route);
+route();
+</script>
+</body>
+</html>
