@@ -206,7 +206,8 @@ const PRICE = 20, TRIAL = 5;
 const MEMBERSHIP = { monthly: 9.99, yearly: 69 };
 const CONTACT = 'tutlix.ceo@gmail.com';
 /* Paddle checkout: fill these in once Paddle is approved (client-side token + price IDs). */
-const PADDLE = { env: 'sandbox', token: 'test_da2dcc86169e11bf28f88a96b79', monthly: 'pri_01m5vgz0w4zp2qmxds3p03n86c', yearly: 'pri_01m5vh051jc55vfqtt4rwcaxz3' };
+const PADDLE = { env: 'live', token: 'live_fcbd342b4168473a90737dc7cfd', monthly: 'pri_01m5vggppd4bcrk0cm7q3s0s69', yearly: 'pri_01m5vgj0maegnk35pq1cr0kza7' };
+/* sandbox (for testing later): token test_da2dcc86169e11bf28f88a96b79, monthly pri_01m5vgz0w4zp2qmxds3p03n86c, yearly pri_01m5vh051jc55vfqtt4rwcaxz3 */
 const NOTES = {
   'A1.1': 'biology-a1-1-water.html',
   'A1.2': 'biology-a1-2-nucleic-acids.html',
@@ -418,7 +419,7 @@ function openCheckout(plan){
   let tester=false;try{if(/[?&]paddletest=1/.test(location.search))localStorage.setItem('tutlix_tester','1');tester=localStorage.getItem('tutlix_tester')==='1';}catch(e){}
   if(PADDLE.env==='sandbox'&&!tester){if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}return;}
   if(!PADDLE.token||!PADDLE[plan]){if(msg){msg.hidden=false;msg.textContent='Online checkout is opening very soon. To join now, book a trial on the tutoring page and we will set up your membership.';}return;}
-  loadPaddle().then(()=>Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}],settings:{displayMode:'overlay',theme:'light',showAddDiscounts:false}}))
+  loadPaddle().then(()=>Paddle.Checkout.open({items:[{priceId:PADDLE[plan],quantity:1}],settings:{displayMode:'overlay',theme:'light',showAddDiscounts:true}}))
    .catch(()=>{if(msg){msg.hidden=false;msg.textContent='The checkout could not load. Please check your connection and try again, or email '+CONTACT+'.';}});
 }
 async function claimCode(txn){
